@@ -1,0 +1,809 @@
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Visualizing statistical relationships</title><style>
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	text-indent: -1.7em;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, YuMincho, "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Songti TC", "Songti SC", "SimSun", "Nanum Myeongjo", NanumMyeongjo, Batang, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC', 'Noto Sans CJK KR'; }
+
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC', 'Noto Sans Mono CJK KR'; }
+
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, YuMincho, "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Songti TC", "Songti SC", "SimSun", "Nanum Myeongjo", NanumMyeongjo, Batang, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC', 'Noto Sans CJK KR'; }
+
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC', 'Noto Sans Mono CJK KR'; }
+
+.highlight-default {
+}
+.highlight-gray {
+	color: rgb(155,154,151);
+}
+.highlight-brown {
+	color: rgb(100,71,58);
+}
+.highlight-orange {
+	color: rgb(217,115,13);
+}
+.highlight-yellow {
+	color: rgb(223,171,1);
+}
+.highlight-teal {
+	color: rgb(15,123,108);
+}
+.highlight-blue {
+	color: rgb(11,110,153);
+}
+.highlight-purple {
+	color: rgb(105,64,165);
+}
+.highlight-pink {
+	color: rgb(173,26,114);
+}
+.highlight-red {
+	color: rgb(224,62,62);
+}
+.highlight-gray_background {
+	background: rgb(235,236,237);
+}
+.highlight-brown_background {
+	background: rgb(233,229,227);
+}
+.highlight-orange_background {
+	background: rgb(250,235,221);
+}
+.highlight-yellow_background {
+	background: rgb(251,243,219);
+}
+.highlight-teal_background {
+	background: rgb(221,237,234);
+}
+.highlight-blue_background {
+	background: rgb(221,235,241);
+}
+.highlight-purple_background {
+	background: rgb(234,228,242);
+}
+.highlight-pink_background {
+	background: rgb(244,223,235);
+}
+.highlight-red_background {
+	background: rgb(251,228,228);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(55, 53, 47, 0.6);
+	fill: rgba(55, 53, 47, 0.6);
+}
+.block-color-brown {
+	color: rgb(100,71,58);
+	fill: rgb(100,71,58);
+}
+.block-color-orange {
+	color: rgb(217,115,13);
+	fill: rgb(217,115,13);
+}
+.block-color-yellow {
+	color: rgb(223,171,1);
+	fill: rgb(223,171,1);
+}
+.block-color-teal {
+	color: rgb(15,123,108);
+	fill: rgb(15,123,108);
+}
+.block-color-blue {
+	color: rgb(11,110,153);
+	fill: rgb(11,110,153);
+}
+.block-color-purple {
+	color: rgb(105,64,165);
+	fill: rgb(105,64,165);
+}
+.block-color-pink {
+	color: rgb(173,26,114);
+	fill: rgb(173,26,114);
+}
+.block-color-red {
+	color: rgb(224,62,62);
+	fill: rgb(224,62,62);
+}
+.block-color-gray_background {
+	background: rgb(235,236,237);
+}
+.block-color-brown_background {
+	background: rgb(233,229,227);
+}
+.block-color-orange_background {
+	background: rgb(250,235,221);
+}
+.block-color-yellow_background {
+	background: rgb(251,243,219);
+}
+.block-color-teal_background {
+	background: rgb(221,237,234);
+}
+.block-color-blue_background {
+	background: rgb(221,235,241);
+}
+.block-color-purple_background {
+	background: rgb(234,228,242);
+}
+.block-color-pink_background {
+	background: rgb(244,223,235);
+}
+.block-color-red_background {
+	background: rgb(251,228,228);
+}
+.select-value-color-default { background-color: rgba(206,205,202,0.5); }
+.select-value-color-gray { background-color: rgba(155,154,151, 0.4); }
+.select-value-color-brown { background-color: rgba(140,46,0,0.2); }
+.select-value-color-orange { background-color: rgba(245,93,0,0.2); }
+.select-value-color-yellow { background-color: rgba(233,168,0,0.2); }
+.select-value-color-green { background-color: rgba(0,135,107,0.2); }
+.select-value-color-blue { background-color: rgba(0,120,223,0.2); }
+.select-value-color-purple { background-color: rgba(103,36,222,0.2); }
+.select-value-color-pink { background-color: rgba(221,0,129,0.2); }
+.select-value-color-red { background-color: rgba(255,0,26,0.2); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="38bdd2fc-34b2-471c-b2d9-4168672bb2db" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">🤝</span></div><h1 class="page-title">Visualizing statistical relationships</h1></header><div class="page-body"><nav id="b26dbec6-c11d-4ec0-97bc-c9e2730dfbb2" class="block-color-blue table_of_contents"><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#89794c46-1902-4d0e-a947-6ea480b38323">서문</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#afa10d2c-71fe-4e27-a407-842f01d71c77">Relating variables with scatter plots¶</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#306acebb-79b4-4c18-9297-2a77938976ad">Emphasizing continuity with line plots¶</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#b45b67e3-96a2-4d66-8a72-282ddd5e5c73">Aggregation and representing uncertainty¶</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#37b048bd-dd0c-431e-9275-3a43dc85a2ea">Plotting subsets of data with semantic mappings¶</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#b582207d-3459-47fa-b231-fb993c4079da">Plotting with date data¶</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#01df1670-eceb-48b4-9f51-f15bb7f9ca9c">Showing multiple relationships with facets</a></div></nav><p id="a115b491-c957-4668-a8cf-df74b078bf03" class="">
+</p><p id="62d7f442-18eb-4a34-a54c-2e8c86d0c033" class="">
+</p><figure id="6808284a-d74f-4725-bfc3-c9b94bfe3e60"><a href="https://seaborn.pydata.org/tutorial/relational.html" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Visualizing statistical relationships - seaborn 0.10.0 documentation</div><div class="bookmark-description">Statistical analysis is a process of understanding how variables in a dataset relate to each other and how those relationships depend on other variables. Visualization can be a core component of this process because, when data are visualized properly, the human visual system can see trends and patterns that indicate a relationship.</div></div><div class="bookmark-href"><img src="https://seaborn.pydata.org/_static/favicon.ico" class="icon bookmark-icon"/>https://seaborn.pydata.org/tutorial/relational.html</div></div></a></figure><p id="bdfcd34e-f7e8-43e1-a8ae-a521d572ff2c" class="">
+</p><h3 id="89794c46-1902-4d0e-a947-6ea480b38323" class="">서문</h3><p id="5294184b-4ef9-4a57-94d6-49acbd90f44d" class="">
+</p><p id="04ce9b84-5299-4168-8358-b9e3f62286c2" class="block-color-gray">Statistical analysis is a process of understanding how variables in a dataset relate to each other and how those relationships depend on other variables. Visualization can be a core component of this process because, when data are visualized properly, the human visual system can see trends and patterns that indicate a relationship.</p><p id="de32f015-fa77-461f-98f3-0ed9c8872f22" class="">
+</p><p id="d286a085-fedb-4908-95b5-d198871a76a7" class="">통계 분석은 데이터 세트 속 변수들이 각각 어떻게 연관되어 있는지, 그리고 그 관계가 또 다른 변수와는 어떻게 걸쳐있는지 (depend on) 이해하는 과정이다. 시각화는 이러한 과정의 핵심 요소라고 볼 수 있다. 왜냐하면 데이터가 적합하게 시각화 될 때 비로소, 우리의 눈이 관계를  나타내는 트렌드와 패턴을 파악할 수 있기 때문이다.</p><p id="76e6c632-65fd-4bd7-acc7-2d2b570af19d" class="">
+</p><p id="2d3314bd-4b7d-4790-ad56-c29de80e20b1" class="">*indicate : 표기하다</p><p id="dabbe717-3217-474e-996c-b0570ab4f69a" class="">
+</p><p id="f0ade8e8-3952-43b9-a25d-9f9e4e0520c8" class="">
+</p><p id="b223f1e6-3787-453f-b953-c91f1e8ede0f" class="block-color-gray">We will discuss three seaborn functions in this tutorial. The one we will use most is <a href="https://seaborn.pydata.org/generated/seaborn.relplot.html#seaborn.relplot"><code><strong>relplot()</strong></code></a>. This is a <a href="https://seaborn.pydata.org/introduction.html#intro-func-types">figure-level function</a> for visualizing statistical relationships using two common approaches: scatter plots and line plots. <a href="https://seaborn.pydata.org/generated/seaborn.relplot.html#seaborn.relplot"><code><strong>relplot()</strong></code></a> combines a <a href="https://seaborn.pydata.org/generated/seaborn.FacetGrid.html#seaborn.FacetGrid"><code><strong>FacetGrid</strong></code></a> with one of two axes-level functions:</p><p id="9ef9644d-06a9-4b77-9949-423a28a6d382" class="">
+</p><p id="765f88d3-ad92-49e6-a9a1-9a96b75699d6" class="">이번 튜토리얼에서는 3가지 Seaborn의 클래스에 대해서 알아 볼 것이다.</p><p id="7a4c5dc2-0b81-400f-9553-161a9a1f60d8" class="">그 중 가장 자주 쓸 것이 바로 <code>relplot()</code> 이다. 이 &quot;relation plot&quot;은 기본적으로 통계적 관계들을 시각화하는 Figure-level에 속하는 클래스이다. 이때 <code>relplot()</code>은 두 가지 공통적인 접근방식을 사용하고 있다.</p><p id="b95d4a06-c298-470c-b0db-db7da01d6565" class="">
+</p><p id="d0832623-6a0e-4fed-b354-114374c1259c" class="">하나는 산점도 (scatter plots)이고, 또 하나는 선 그래프 (line plots) 이다.</p><p id="d6bf37dc-ef17-4de5-9757-4c5e614dbfe3" class="">
+</p><p id="c32e2d0a-0646-4dea-b326-74b0b370cc96" class="">나아가 <code>relplot()</code> 은 <code>FacetGrid</code>(파셋 그리드)라는 Seaborn의 클래스와 함께 쓰인다. 파셋 그리드는 axes-level에 속하는 두 개의 클래스 중 하나이다.</p><p id="3935b301-275a-4053-9e65-c30f851bd497" class="">
+</p><figure id="e6446257-dd7d-418a-bc8a-1bdc846a5543" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/_2020-04-20_22.48.12.png"><img style="width:326px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/_2020-04-20_22.48.12.png"/></a><figcaption>Figure와 Axes 개념 구분을 위한 참고 이미지</figcaption></figure><p id="4adf9a51-ee96-4884-8588-0c25829f1c99" class="">
+</p><p id="25f8dafb-15e0-4196-b7a4-72a4072e3464" class="">
+</p><ul id="b3f77ce1-6577-4f66-90b3-861b5416afef" class="bulleted-list"><li><a href="https://seaborn.pydata.org/generated/seaborn.scatterplot.html#seaborn.scatterplot"><code><strong>scatterplot()</strong></code></a> (with <code>kind=&quot;scatter&quot;</code>; the default)</li></ul><ul id="6fc5f8ff-598e-4cf0-86cc-963cfb296d78" class="bulleted-list"><li><a href="https://seaborn.pydata.org/generated/seaborn.lineplot.html#seaborn.lineplot"><code><strong>lineplot()</strong></code></a> (with <code>kind=&quot;line&quot;</code>)</li></ul><p id="af3e7cc9-fd9f-4285-9af1-10edbd5189a5" class="">
+</p><p id="6330ef8e-012e-4c46-bba8-ceeacb2764ea" class="block-color-gray">As we will see, these functions can be quite illuminating because they use simple and easily-understood representations of data that can nevertheless represent complex dataset structures. They can do so because they plot two-dimensional graphics that can be enhanced by mapping up to three additional variables using the semantics of hue, size, and style.</p><p id="22f0b08a-e173-41cd-8847-496298e03a1c" class="">
+</p><p id="6c92aa14-82c3-4c64-a00e-11f8d585907d" class="">각 plot의 링크에 들어가 예시를 통해 확인할 수 있듯, 이 두 도표들 모두 데이터들을 상당히 잘 표현하고 있다. 비록 데이터 세트의 구조는 복잡했지만, 이를 표현함에 있어서 간단하면서도 쉽게 이해되는 방식으로 나타냈기 때문이다. 이는 2차원 도표를 쓰면서도 hue, size, style이라는 추가적인 변수들을 사용해 표현력이 한층 끌어 올렸기 때문에 가능한 일이다.</p><p id="4d866007-b656-4536-8e4f-39260f15fc54" class="">
+</p><p id="628b03c0-a4db-4d12-a401-9710fefcb3eb" class="">*illuminating 이해를 돕는, 분명하게 하는</p><p id="35ff514a-c57d-40ac-874f-65fae89bd450" class="">
+</p><pre id="c10266a7-bf0e-48f6-bd77-7c8078450741" class="code"><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(style=&quot;darkgrid&quot;)</code></pre><p id="5bafc3b5-37d0-45e3-89b3-bd9d118ffa71" class="">
+</p><h3 id="afa10d2c-71fe-4e27-a407-842f01d71c77" class="">Relating variables with scatter plots¶</h3><p id="d5ee46c3-62a1-4d9a-be08-ad4c92c82d2d" class="">산점도를 통해 변수들을 연결하기</p><p id="85dd25ed-28cf-43be-be41-0d26e6515812" class="block-color-gray">
+</p><p id="c60f4c05-7c18-47c7-895a-ac07394cb278" class="block-color-gray">The scatter plot is a mainstay of statistical visualization. It depicts the joint distribution of two variables using a cloud of points, where each point represents an observation in the dataset. This depiction allows the eye to infer a substantial amount of information about whether there is any meaningful relationship between them.</p><p id="dfad8e67-f8e2-4051-81ac-1bdbe75febbc" class="">
+</p><p id="db606ec5-e207-4778-8a70-7f35cc55b943" class="">산점도야 말로 통계적 시각화의 중추라고 할 수 있다. 산점도는 데이터를 기반으로 형성된 점들의 뭉치(cloud)를 사용해 두 변수 간의 공통적인 분포를 묘사하는 그래프이다. 이를 보는 사람은 변수 간의 실질적인 정보, 즉 의미있는 상관관계 등을 추론할 수 있다.</p><p id="439bbbd3-ab2f-4742-a5c8-ec74e11c4fd2" class="">
+</p><p id="ea4aaa00-2d5e-4e32-be6b-5988a49da62e" class="">*mainstay 대들보</p><p id="b94e379b-63db-4959-b6d4-7e4b48641aff" class="">*depict 묘사하다</p><p id="d36fc53b-152d-4a2c-820b-50d4bd464ff5" class="">*제발 substantial 을 잠재적인이라고 해석하지마... 실질적인, 상당한으로 해석해야해</p><p id="7ab05369-cb32-4426-8a20-1e2837588231" class="">*infer a relationship 관계를 &quot;추론 infer&quot;</p><p id="5c26f5bf-ec34-439c-a28c-0cc965ea6241" class="">
+</p><p id="57a22f81-6b8a-4d2e-adcc-effc41fd1c33" class=""><mark class="highlight-gray">There are several ways to draw a scatter plot in seaborn. The most basic, which should be used when both variables are numeric, is the scatterplot() function. In the categorical visualization tutorial, we will see specialized tools for using scatterplots to visualize categorical data. The scatterplot() is the default kind in relplot() (it can also be forced by setting kind=&quot;scatter&quot;):</mark></p><p id="f6c9465e-0182-46fc-8f85-b62c783fddd1" class="">
+</p><p id="776f7fc5-9979-4b4b-9f5e-1f13aea98ee8" class="">Seaborn 패키지를 통해 산점도를 그리는 방법이 하나만 있는 건 아니다. 가장 기본이 되는 것은 x, y 두 축을 이루는 변수가 모두 숫자로 표현될 수 있는 양적 데이터 기반의 <code>scatterplot()</code> 클래스이다. 이와 다르게 명목 범주들을 시각화 해보는 튜토리얼에서는 좀 더 특별한 툴을 써볼 것이다. <code>scatterplot()</code>은 <code>relplot()</code>의 디폴트 방식 (kind) 으로 지정되어 있다.</p><p id="93b04c2c-a9cf-4fe3-9b5f-f3849961bf0b" class="">(물론 <code>kind = &quot;scatter&quot;</code> 를 통해 직접 명령할 수도 있다)</p><p id="17d2e4e7-3916-47fe-893c-7c8aec2ab615" class="">
+</p><figure id="21aa51b6-affd-4238-a5aa-c631a93a8c61" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_4_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_4_0.png"/></a></figure><p id="5b5bd319-49ff-4729-ab45-140d45d04d45" class="">
+</p><p id="45b12e85-89e3-46fd-9cf9-31b7d81d50e9" class="">
+</p><p id="6e078df1-3773-4f2d-aa35-bc6e6b4b5ffc" class="block-color-gray">While the points are plotted in two dimensions, another dimension can be added to the plot by coloring the points according to a third variable. In seaborn, this is referred to as using a “hue semantic”, because the color of the point gains meaning:</p><p id="c17e3a97-466f-48e6-b251-714062ac115f" class="">
+</p><p id="5dce1fe7-37e1-4c9d-8ba5-1829a500ff4a" class="">점들이 2차원 화면에 기입되는 동안, 또 다른 차원의 개념을 추가할 수 있다. 세 번째 변수는 점들의 색깔을 달리하여 표현하는 것이다. Seaborn에서는 이를 &quot;hue semantic&quot; 즉 &quot;색 구분을 통한 의미 전달&quot; 용법을 사용했다고 표현한다. 점들이 각자의 의미들을 가졌기 때문이다.</p><p id="8543c87b-fe82-4ed8-85d1-654e4c8217cd" class=""><em>(주석 : 이후 hue semantic에 대한 번역은 &quot;hue를 통한 의미구분&quot; 이라고 표현하였습니다)</em></p><p id="2fc9a871-dfeb-4865-b699-d858af1aef35" class="">
+</p><pre id="0591729f-c428-4510-b499-6fd325be0b37" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, hue=&quot;smoker&quot;, data=tips);</code></pre><p id="2ae1da0e-b270-4ae6-8c1e-9e95a9f596da" class="">
+</p><p id="cf0c5013-6e8e-4a0b-aca4-acb40fafb8dd" class="">
+</p><figure id="9e785554-3930-466e-b75e-f8da2ea2bac4" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_6_0.png"><img style="width:424px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_6_0.png"/></a></figure><p id="8435b0aa-f911-4076-b98c-ab0a4c77b8d6" class="">
+</p><p id="30e84d64-9182-4e8d-b107-4f9bba24e92c" class=""><mark class="highlight-gray">To emphasize the difference between the classes, and to improve accessibility, you can use a different marker style for each class:</mark></p><p id="9bc0e6e4-0359-4f38-abe4-5b0a4df06a08" class="">
+</p><p id="a91e5374-f80b-4416-ae2d-0fb1d1d5bd43" class="">클래스 간의 차이를 더 강조하고 싶거나, 좀 더 효과적으로 표현하기 위해서는 점의 스타일을 달리할 수 있다 :</p><p id="5ccb1dc5-4f54-4f6a-bab6-fcafcc9ae1b2" class="">
+</p><pre id="421cf483-1ea7-41f7-b026-bc8a11d98361" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, hue=&quot;smoker&quot;, style=&quot;smoker&quot;,
+            data=tips);</code></pre><p id="f51cd020-1cf6-4976-b19c-00b1818ee8e6" class="">
+</p><p id="557a2523-817b-4a9e-a8d2-bdae0fb3c7cc" class="block-color-gray">It’s also possible to represent four variables by changing the hue and style of each point independently. But this should be done carefully, because the eye is much less sensitive to shape than to color:</p><p id="2bb17f2c-92bb-4df7-bbc9-ad81b75fda25" class="">
+</p><p id="2583c216-2101-4c94-8993-f8ced7e425aa" class="">4개의 변수까지도 색과 스타일을 달리하여 표현하는 게 가능하다. 하지만 눈으로 스타일 차이 (점 모양의 차이)를 인식하는 게 색깔 차이를 구분하는 것보다 어렵기 때문에 이때는 주의해야 한다.</p><p id="0f050843-6e4c-4d7a-9c6c-61ea817d7728" class="">
+</p><pre id="1011a988-c1df-4a27-a404-a8d8a9ae634c" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, hue=&quot;smoker&quot;, style=&quot;time&quot;, data=tips);</code></pre><figure id="571adc7f-11ba-43be-9fc4-37842311ad8b" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_10_0.png"><img style="width:424px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_10_0.png"/></a></figure><p id="da90af40-3d0e-4d5a-b384-ed80528346a4" class="">
+</p><p id="25e52bc3-bfa2-456e-ac86-1d2c888de7b2" class=""><mark class="highlight-gray">In the examples above, the hue semantic was categorical, so the default qualitative palette was applied. If the hue semantic is numeric (specifically, if it can be cast to float), the default coloring switches to a sequential palette:</mark></p><p id="1165633a-b750-43d0-857e-f329b68511c1" class="">
+</p><p id="740aa8d2-4397-4318-8e79-393792667e04" class="">위 예시를 보면, 명목범주의 구분을 hue를 통해 구분하였기 때문에 기본 색깔 팔레트가 적용되었다. 만약 hue로 구분한 값이 수치화된 데이터였다면 (특별히, 만약 그 수치화된 구분이 정수 단위가 아닌 실수<mark class="highlight-gray">float</mark> 단위였다면) 점의 색은 채도가 데이터 크기에 따라 *점진적으로 색이 변해가는 팔레트를 기본적으로 사용하게 된다.</p><p id="9d7cbbbd-e698-496e-909f-99c296886c36" class=""><em>*해당 팔레트는 데이터에 따라 색이 조금씩 변해가기 때문에 &quot;시퀀셜sequential 팔레트&quot;라고 부르며 튜토리얼 후반부에서 다시 다룬다.</em></p><p id="0be9810f-d04f-4421-a2b3-1fe190afa929" class="">
+</p><pre id="1c8df859-1144-4ef7-8356-91b2b4578f2c" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, hue=&quot;size&quot;, data=tips);</code></pre><figure id="7b70ce33-fbf7-4bdd-a96d-f05c18b06ce3" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_12_0.png"><img style="width:409px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_12_0.png"/></a></figure><p id="a7cc67ca-c05f-456b-8b06-cdd95a6556e4" class="">
+</p><p id="17bd7337-975c-43ba-a50d-297f033b775a" class=""><mark class="highlight-gray">In both cases, you can customize the color palette. There are many options for doing so. Here, we customize a sequential palette using the string interface to cubehelix_palette():</mark></p><p id="d9f8e8db-fb23-4d73-8a3b-11ae35ef50b7" class="">
+</p><p id="e4136f3e-85f7-48da-8656-3cc34c39f416" class="">물론 그 두 경우 모두 컬러 팔레트를 커스터마이징 할 수 있고 그를 위한 옵션들도 많이 준비되어 있다. 여기선, 스트링 타입으로 <code>cubehelix_palette()</code> 를 조작하는 인터페이스를 사용해 봄으로써 시퀀셜 팔레트를 커스터마이징 해볼 것이다.</p><p id="6ae39364-3b93-44ed-8954-b3033ab84d8a" class="">
+</p><figure id="ec419f54-1927-41b1-a61a-545b2e0635c4" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/_2020-04-22_13.43.41.png"><img style="width:468px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/_2020-04-22_13.43.41.png"/></a><figcaption>cubehelix란 정사각형모양이란 뜻으로, cubehelix는 위와 같이 색이 변해가는 팔레트를 말한다. (완전히 스무스하게 색이 변하가는 팔레트는 아니고, 단계적으로descrete 색이 변해감)</figcaption></figure><p id="d1e1d2e3-fa72-4d65-86ba-0e0b60b9b96a" class="">
+</p><pre id="7e1b0b2d-d7d5-4e0d-a349-b9911b8d7074" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, hue=&quot;size&quot;, palette=&quot;ch:r=-.5,l=.75&quot;, data=tips);</code></pre><p id="10ba8491-079e-41a1-8b46-39afcbcdfcaf" class="">
+</p><figure id="f04a4d63-3484-4af4-8a6a-c75e1a4bdd56" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_14_0.png"><img style="width:409px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_14_0.png"/></a></figure><p id="f0fd2d41-2fe4-4923-aafb-5f8fff7d904c" class="">
+</p><p id="6202581b-2431-4091-af7e-8a22105d4024" class=""><mark class="highlight-gray">The third kind of semantic variable changes the size of each point:</mark></p><p id="091139cd-b40e-4597-9ba5-46b5e6178575" class="">세번째로 소개할 의미를 담는 변수는 각 점들의 크기 변화이다.</p><pre id="8bb29794-132c-4f89-86fa-b14f8763b228" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, size=&quot;size&quot;, data=tips);</code></pre><figure id="8d195134-f307-490b-ba74-070817c7829c" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_16_0.png"><img style="width:409px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_16_0.png"/></a></figure><p id="f05e47b4-0286-4b05-8f39-71a3bbdb77fa" class="">
+</p><p id="4bac0fa9-395a-4795-a9a9-41409de1205e" class="">
+</p><p id="fc397cba-1566-4f41-ab0c-f0c2293d76e7" class="block-color-gray">Unlike with matplotlib.pyplot.scatter(), the literal value of the variable is not used to pick the area of the point. Instead, the range of values in data units is normalized into a range in area units. This range can be customized:</p><p id="d6efb4cf-ac97-4b2b-8ccb-f00fa591f63d" class="">
+</p><p id="69a31d62-696f-4b36-aa58-00a472361d40" class=""><code>matplotlib.pyplot.scatter()</code> 와는 다르게, sizes 인자(arguments)에 기입한 값<code><em><mark class="highlight-gray">sizes = (15, 200)</mark></em></code>이 점의 영역을 표현하는데 바로 반영되진 않는다. 대신, 원래 데이터가 갖고 있는 범위와 매개변수로 입력해 둔 범위를 정규화를 통해 맞춘다. 아래 코드에서 설정한 범위<code><em><mark class="highlight-gray">sizes = (15, 200)</mark></em></code>는 다음과 같이 커스터마이징 될 수 있다.</p><p id="8bfc9f74-6ef2-41e9-9a8e-114f7123d86a" class="">
+</p><pre id="6650f30e-eef4-4e85-aed6-dbefdd7449e2" class="code"><code>sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, size=&quot;size&quot;, sizes=(15, 200), data=tips);</code></pre><p id="2e0016b9-472b-43f9-8ff2-c110a7013799" class="">
+</p><figure id="e12565e0-7beb-4c44-a80e-408cbfafb61d" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_18_0.png"><img style="width:409px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_18_0.png"/></a></figure><p id="1cc56138-15f8-4f5b-8199-85f1401da346" class="">
+</p><p id="e01d1e55-344f-46a5-9d85-81286dbb8c25" class="block-color-gray">More examples for customizing how the different semantics are used to show statistical relationships are shown in the <code>scatterplot()</code> API examples.</p><p id="eae1ecd5-0d36-4899-a270-2539e049c020" class="">
+</p><p id="729f0b98-63e4-4577-bf7a-ec79fa4d5546" class="">통계적 관계를 나타내기 위해 각기 다른 의미를 가진 변수를 사용하는 기법에 대한 더 많은 예시는 <code>scatterplot()</code> 의 API 예시들에서 볼 수 있다.</p><p id="1fe862ea-faf6-407f-bca4-48a53f2d337e" class="">
+</p><p id="117631dc-c707-42fa-bc4d-a0b2ccac5890" class="">
+</p><h3 id="306acebb-79b4-4c18-9297-2a77938976ad" class="">Emphasizing continuity with line plots¶</h3><p id="7b27fbdb-1165-4d84-a731-08e5d112176b" class="">선 그래프를 통해 지속되고 있음을 강조하는 기법</p><p id="e8574b0f-5f7a-4a1c-a48f-4ed06792aed4" class="">
+</p><p id="859b99b9-2a32-44c9-895d-6760fa1f14ec" class=""><mark class="highlight-gray">Scatter plots are highly effective, but there is no universally optimal type of visualisation. Instead, the visual representation should be adapted for the specifics of the dataset and to the question you are trying to answer with the plot.</mark></p><p id="325e4f73-8b37-4bcf-8787-c9cb0067e8ee" class="">
+</p><p id="27398c47-d026-4980-9de2-ba7b97700ad0" class="">산점도는 매우 효과적이지만, 글로벌하게 통용되는 최적의 표현 방식이 정해져 있는 건 아니다. 대신 데이터 셋의 종류나 해결하고자 하는 물음에 잘 대응하여 시각화를 진행해야한다.</p><p id="86cde576-2900-4892-84cf-5f83347003a7" class="">
+</p><p id="400f03cf-bc44-4e23-a823-83b3e989e734" class="">
+</p><p id="57802d94-59ef-43ae-98e1-5bfdcbbfced1" class="block-color-gray">With some datasets, you may want to understand changes in one variable as a function of time, or a similarly continuous variable. In this situation, a good choice is to draw a line plot. In seaborn, this can be accomplished by the lineplot() function, either directly or with relplot() by setting kind=&quot;line&quot;:</p><p id="3a149708-bad9-4e74-b27e-a6ca6842a5cd" class="">
+</p><p id="a9cf3f65-a47e-44df-be7a-f1212fad3bff" class="">데이터 셋을 표현함에 있어써, 시간이 지나는 것 혹은 그와 유사한 지속성을 갖고 있는 변수를 이해하고 싶을 때도 있다. 이러한 상황에서 좋은 방법 중 하나가 선 그래프를 그리는 것이다. Seaborn에서는 <code>lineplot()</code> 메소드를 통해 이를 구현할 수 있으며 <code>lineplot()</code> 명령어를 직접 입력하든, <code>relplot()</code> 을 하고 <code>kind = &quot;line&quot;</code> 을 인자로 입력해 구현하든 상관 없다.</p><p id="46cb43f7-b377-49fc-b60b-f5f28406aacc" class="">
+</p><pre id="f411112f-23f4-4e67-bca3-2f99906b19b7" class="code"><code>df = pd.DataFrame(dict(time=np.arange(500),
+                       value=np.random.randn(500).cumsum()))
+g = sns.relplot(x=&quot;time&quot;, y=&quot;value&quot;, kind=&quot;line&quot;, data=df)
+g.fig.autofmt_xdate()</code></pre><figure id="3709683f-9d00-4769-aeab-18344406397b" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_21_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_21_0.png"/></a></figure><p id="d7be9c7a-fb28-4523-a8ac-cb40c4c0c58e" class="">
+</p><p id="817af5e6-bcc0-4c43-b106-79b3d6db7c8a" class="">
+</p><p id="0b801172-0e9d-400f-9cc9-e8a0434cc102" class=""><mark class="highlight-gray">Because lineplot() assumes that you are most often trying to draw y as a function of x, the default behavior is to sort the data by the x values before plotting. However, this can be disabled:</mark></p><p id="25dd329e-26c0-4a33-8494-18af8771b0d5" class="">
+</p><p id="4a245055-2a62-4a63-976e-781f7d95f176" class=""><code>lineplot()</code>은 대개 x 축이 변함과 그에 따른 y 값을 그린다는 걸 전제로 하고 있다. 그래서 도표를 구현하기 전에, 기본적으로 x 축에 들어갈 변수를 값에 따라 정렬한다. 그러나 아래처럼 표현하는 건 불가능하다 :</p><p id="35e8304e-fea6-47e6-b3f2-8b16c7d7bc8d" class="">
+</p><pre id="d40f4ffe-caf3-490a-8167-64e9ecd84247" class="code"><code>df = pd.DataFrame(np.random.randn(500, 2).cumsum(axis=0), columns=[&quot;x&quot;, &quot;y&quot;])
+sns.relplot(x=&quot;x&quot;, y=&quot;y&quot;, sort=False, kind=&quot;line&quot;, data=df);</code></pre><figure id="af093d31-4174-4ef3-aaea-058390976420" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_23_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_23_0.png"/></a></figure><p id="d3bc3ddc-2c29-430e-88cf-8c5959da023d" class="">
+</p><h3 id="b45b67e3-96a2-4d66-8a72-282ddd5e5c73" class="">Aggregation and representing uncertainty¶</h3><p id="1d2c3315-e53e-4ef5-ba26-7499966d85a5" class="">불특정구간에 대한 데이터 결집과 표현에 대해서</p><p id="8bb66e8f-336e-43cb-acfc-43a81f3c0473" class="">
+</p><p id="e9f2024f-7e31-4c72-8703-45db5249bf50" class="">
+</p><p id="d1e5d227-e25e-4d47-8c79-b1fba4147ebf" class=""><mark class="highlight-gray">More complex datasets will have multiple measurements for the same value of the x variable. The default behavior in seaborn is to aggregate the multiple measurements at each x value by plotting the mean and the 95% confidence interval around the mean:</mark></p><p id="f0e00970-2ae9-4569-9dc9-c518770d90a5" class="">
+</p><p id="65d87684-be4d-46d5-a16f-3b42ca3a8e83" class="">보다 복잡한 데이터셋은 x 축에 따른 y 값으로 하나가 아닌 다양한 값을 갖고 있을 수 있다. 이때 Seaborn의 기본 처리방식은 x 값에 따라 나타난 다양한 값들을 모아서 평균 낸 값들을 선으로 연결하고, 평균으로부터 95%의 신뢰구간을 색으로 표현하는 것이다.</p><p id="5b255b5e-7747-4c19-aae5-a0afcfeb6ccd" class="">
+</p><pre id="71660ba9-52af-4944-9e3f-7fad7df3c7ba" class="code"><code>fmri = sns.load_dataset(&quot;fmri&quot;)
+sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, kind=&quot;line&quot;, data=fmri);</code></pre><figure id="a20cfb0a-83d3-40cd-a589-b5efb9f27f0c" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_25_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_25_0.png"/></a></figure><p id="8723fa2b-5cd8-434a-895c-ea39dbd3eb73" class="">
+</p><p id="d5a8d43d-d787-4fd7-984c-fbffa79d4546" class=""><mark class="highlight-gray">The confidence intervals are computed using bootstrapping, which can be time-intensive for larger datasets. It’s therefore possible to disable them:</mark></p><p id="8287309f-53c2-498c-bb84-c7bb77cfb6dc" class="">그 신뢰구간은 부트스트래핑 기법을 사용해 계산된다. 데이터 셋이 커지면 부트스트래핑이란 게 시간을 오래 잡아먹기 때문에, 이 신뢰구간 계산 기능을 끄는 것도 가능하다.</p><figure id="9ac5c224-2fb1-46ea-b6bc-336bd4bf5f8a" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_27_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_27_0.png"/></a></figure><p id="afa56542-3061-44aa-8f9c-2c2f827a6eed" class="">
+</p><p id="da712ee8-1390-4854-9e62-f7b68285cf4c" class=""><mark class="highlight-gray">Another good option, especially with larger data, is to represent the spread of the distribution at each timepoint by plotting the standard deviation instead of a confidence interval:</mark></p><p id="db0ec583-f82e-4afc-8d91-f582b199e86b" class="">
+</p><p id="f0f59a6e-9a5d-4264-a9ce-f338d7c0032d" class="">특별히 큰 데이터에 처리함에 있어서 훌륭한 대안을 소개한다. 각 시점마다 (x 축) 데이터의 표준편차 안에 들어있는 데이터 분포를 표현하면서 신뢰구간 대신 사용하는 것이다.</p><p id="445e14d8-cf18-438e-866d-02c1711f7f11" class="">
+</p><pre id="11ee4ed8-fc4e-439e-933d-909cb97dcc9f" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, kind=&quot;line&quot;, ci=&quot;sd&quot;, data=fmri);</code></pre><figure id="419ab552-73da-45ec-a5de-8ae09b09da23" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_29_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_29_0.png"/></a></figure><p id="0d8f05a7-f002-4d4a-9943-35dfcea961fd" class="">
+</p><p id="2f52c1a5-e77b-468a-a9e2-6ba8dd989b32" class="block-color-gray">To turn off aggregation altogether, set the <code>estimator</code> parameter to <code>None</code>. This might produce a strange effect when the data have multiple observations at each point.</p><p id="014bc990-bfb2-4e8d-b0ca-a90594aa7328" class="">
+</p><p id="8cd2b3a8-eb68-4467-b001-30269100af6c" class="">여러 값을 대표 데이터로 표현하는 일련의 기능들을 모두 끄려면 <code>estimator</code> 매개변수를 <code>None</code> 으로 설정해주면 된다. 이런 선택은 한 시점마다 여러 y값을 갖는 데이터 표현할 때 흔히 쓰이는 방식이 아니기 때문에 굉장히 낯선 느낌을 줄 것이다. </p><p id="b09ab321-d2cb-4217-9553-516fc254c82a" class="">
+</p><pre id="067bf95f-a8f3-42d2-95ac-00ab6e48329d" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, estimator=None, kind=&quot;line&quot;, data=fmri);</code></pre><figure id="d810d19b-8a6f-4d36-b062-5d7e8256c8fc" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_31_0.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_31_0.png"/></a></figure><p id="560f0618-1508-41f7-abee-2182edeaba35" class="">
+</p><h3 id="37b048bd-dd0c-431e-9275-3a43dc85a2ea" class="">Plotting subsets of data with semantic mappings¶</h3><p id="37fa32bb-fa72-4934-bc5a-530bb23c6c28" class="">의미 구분을 통해 서브셋(subsets) 그래프 그리기</p><p id="8d142d23-2ace-47ce-a274-db2be142f82b" class="">
+</p><p id="c81404e9-5d01-4f40-ae09-c0465d08acaf" class="">
+</p><p id="1e310591-d0f3-4e94-ad74-c21825b2c8f3" class=""><mark class="highlight-gray">The lineplot() function has the same flexibility as scatterplot(): it can show up to three additional variables by modifying the hue, size, and style of the plot elements. It does so using the same API as scatterplot(), meaning that we don’t need to stop and think about the parameters that control the look of lines vs. points in matplotlib.</mark></p><p id="10c6afb6-f1fd-441d-a7ae-e6c0ba941987" class="">
+</p><p id="da96ae09-6652-4225-95e3-6b57fbe2e5fc" class=""><code>scatterplot()</code>과 유사한 응용 기능을 <code>lineplot()</code> 도 갖고 있다. hue, size, style 총 3개의 추가적인 변수를 두고 의미 구분을 할 수 있다. 산점도와 동일한 API를 갖고 있기 때문에 가능한 일이며, 이 말인 즉슨 (Seaborn의 기반 시스템인) matplotlib의 선 그래프 그릴 때 필요한 매개변수에 대해서는 굳이 따로 고민하지 않아도 된다는 뜻이다.</p><p id="36603092-a387-49c5-8565-8c553cfa6385" class="">
+</p><p id="2e7d9bc9-f1fb-4a9a-9965-f737b77c7d5d" class="">주석 : hue를 통한 의미 구분을 해서 그래프를 그리면 그래프가 두 가지 이상이 동시에 그려지게 되는데, 그걸 Seaborn 도큐먼트는 서브셋(subsets) 이라고 표현하였다. 그래서 이번 소챕터 주제에 subsets 라는 말이 들어간다.</p><p id="d0740c97-da36-4074-ac4e-2a78c1bf5e29" class="">
+</p><p id="41bbdbad-9a80-463a-bf5f-ba2a3e2c6fec" class=""><mark class="highlight-gray">Using semantics in lineplot() will also determine how the data get aggregated. For example, adding a hue semantic with two levels splits the plot into two lines and error bands, coloring each to indicate which subset of the data they correspond to.</mark></p><p id="9a528957-d0bf-4c03-99b0-d86c45784ab2" class="">
+</p><p id="47d23167-f0de-421e-aedc-7383fcf8a707" class="">이러한 의미 구분 변수(hue, size, style)를 선 그래프에서 쓰면, 마찬가지로 어떻게 데이터를 응집할지가 결정된다. 예를 들어, hue 의미 구분 변수를 통해 2개로 데이터를 나눠 표현하면 2개의 선과 오차 밴드 (앞서 언급한 신뢰구간이나 표준편차를 표현한 색 구분 띠) 가 나타난다. 이 둘은 각각 색깔을 달리하여 어떤 데이터에 대응해 표현했는지를 구분한다.</p><p id="d3767607-208e-49ac-80da-de4ae07dc5b0" class="">
+</p><p id="1745a6f3-85ea-4559-b6b3-4e85e0b5a23d" class=""> </p><pre id="83b5a726-cd33-41b5-bb42-452e1d854016" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;event&quot;, kind=&quot;line&quot;, data=fmri);</code></pre><figure id="11e6cf5c-9df5-4b8a-8b4a-d569c89100ad" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_33_0.png"><img style="width:413px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_33_0.png"/></a></figure><p id="454c2598-4da3-4a09-bf26-c879b2f96417" class="">
+</p><p id="d84a59c3-71f1-4cc3-9f4a-83a7a14b3773" class=""><mark class="highlight-gray">Adding a style semantic to a line plot changes the pattern of dashes in the line by default:</mark></p><p id="d0054cbc-9e72-4176-902e-171c14360625" class="">
+</p><p id="60050024-5438-465e-81ba-54229b4ec9d9" class="">style 의미 변수를 선 그래프에 추가한다면 선을 그리는 방식 (주석 : 점선이냐 파선이냐 등의 dash 개념)의 패턴을 달리하게 된다. 딱히 지정해 주지 않는다면 클래스의 기본 세팅을 바탕으로 style이 결정된다.</p><p id="1c01123d-d7ae-4107-90b0-d17b47db7cd2" class="">
+</p><pre id="1ff19414-d19c-4260-a08b-b2c82aa50392" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;region&quot;, style=&quot;event&quot;,
+            kind=&quot;line&quot;, data=fmri);</code></pre><figure id="5d25a8b8-5f62-4af4-a1e0-7b7cd39b848e" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_35_0.png"><img style="width:422px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_35_0.png"/></a></figure><p id="8c544fa2-5c20-466c-8364-6ab4db7b17e2" class="">
+</p><p id="d6f82379-c74d-4c02-a802-2714f162d00e" class="block-color-gray">But you can identify subsets by the markers used at each observation, either together with the dashes or instead of them:</p><p id="e8973521-a805-4878-98f9-24936b192174" class="">
+</p><p id="ee0c05fa-48e8-4017-b53a-b8e510f49b62" class="">하지만 여러 그래프들을 마커의 모양을 달리하여 표현도 가능하다. 마커 스타일은 선의 스타일과 함께 쓸 수도 있고, 선 스타일 대신에 마커 스타일로 대신할 수도 있다.</p><p id="fde1b675-9f0b-4de4-8bf4-2a657318e017" class="">
+</p><pre id="a1f15806-cff8-423c-9216-ab0963bc0de6" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;region&quot;, style=&quot;event&quot;,
+            dashes=False, markers=True, kind=&quot;line&quot;, data=fmri);</code></pre><figure id="c163bc9b-402b-47bd-a60c-268a5d61217e" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_37_0.png"><img style="width:422px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_37_0.png"/></a></figure><p id="1083251c-a8f6-402d-9292-d1ab07071103" class="">
+</p><p id="6d8b373a-be17-4ec7-9822-33544e53645d" class="">
+</p><p id="b11adeb8-6a91-42ea-97ff-72b49bd6804a" class=""><mark class="highlight-gray">As with scatter plots, be cautious about making line plots using multiple semantics. While sometimes informative, they can also be difficult to parse and interpret. But even when you are only examining changes across one additional variable, it can be useful to alter both the color and style of the lines. This can make the plot more accessible when printed to black-and-white or viewed by someone with color blindness:</mark></p><p id="a00d6fbf-14b5-477c-814e-2075fbf4fee4" class="">
+</p><p id="6cdb0576-e5c4-40f7-a24b-71af0106ab50" class="">산점도와 더불어 선 그래프를 여러 변수를 통한 구분(hue와 같은 것)을 사용해 쓸 때는 주의해야할 사항이 있다. 그 기법은 유익할 때도 있는 반면, 종종 파악이 더 어려워 질 수도 있다. 비록 단순한 변화량만을 의미구분 기법으로 표기하고 싶더라도 색깔 변화(hue)와 스타일 변화(markers나 dashes)를 둘 다 써보자. 이 방식은 흑백 출력 혹은 색맹과 같은 상황에 놓였을 때 그래프에 대한 접근성을 높일 수 있다.</p><p id="27e6f0eb-a5d7-4373-8ff4-4842c4a85c6c" class="">
+</p><pre id="7ebfbec8-072a-4658-95d1-42a93fcd67eb" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;event&quot;, style=&quot;event&quot;,
+            kind=&quot;line&quot;, data=fmri);</code></pre><figure id="174bf9d7-ffec-47e1-b5d7-f99a193c761b" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_39_0.png"><img style="width:413px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_39_0.png"/></a></figure><p id="9f47e2fc-232e-434d-b8d4-4b22d727492e" class="">
+</p><p id="6b903dce-b9aa-49b9-9b9c-ff717d3ea641" class="">
+</p><p id="a3be859c-3421-4821-8452-123c2736e813" class=""><mark class="highlight-gray">When you are working with repeated measures data (that is, you have units that were sampled multiple times), you can also plot each sampling unit separately without distinguishing them through semantics. This avoids cluttering the legend:</mark></p><p id="00483e01-b24e-4af5-8463-039c3c116876" class="">
+</p><p id="af9559eb-b92e-41b3-900e-9ede8ad4adcc" class="">특정 기간 동안 지속적으로, 여러 샘플을 측정해 작업하고 있다면 굳이 hue와 같은 의미 구분 기법(semantic)으로 구분하는 게 아니라, 각 측정 값을 일일이 그래프로 찍는 방법도 있다. 이 방식은 범례를 쓰면서 데이터를 군집화해서 표현하는 방법과는 다른 방법이다.</p><p id="857fadb9-ef12-4624-af81-330ee3c88d04" class="">(주석 : 바로 앞에서 살펴본 기법은 여러 샘플을 하나의 변수에 포함시킨 뒤 신뢰구간과 같은 오차밴드로 묶어 표현하고 그걸 범례에 표기한 기법이었다.)</p><p id="0b93ccd4-5d38-4f33-b650-86938ed87e28" class="">
+</p><pre id="1e101da8-e133-43c4-a04c-bfdaa7ed9ba3" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;region&quot;,
+            units=&quot;subject&quot;, estimator=None,
+            kind=&quot;line&quot;, data=fmri.query(&quot;event == &#x27;stim&#x27;&quot;));</code></pre><figure id="6d62d0ba-993a-4761-b0b8-9ff633a9adba" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_41_0.png"><img style="width:422px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_41_0.png"/></a></figure><p id="38f43c23-e0dc-4f49-a53a-b149458a5cd8" class="">
+</p><p id="6e1a2399-00e3-49e4-a699-5d1b0d1af6a1" class="">
+</p><p id="8db4f84a-c2c3-404e-9916-da2b389fdc31" class=""><mark class="highlight-gray">The default colormap and handling of the legend in lineplot() also depends on whether the hue semantic is categorical or numeric:</mark></p><p id="752d10c6-082a-4c6d-ba91-1e7108b38e72" class="">
+</p><p id="ff156278-01a5-4b96-a760-bf522e2e0541" class="">hue를 통해 구분(semantic)하고자 하는 데이터가 명목 범인지 수치화된 데이터인지에 따라 표기하는 그래프의 색상이나 범례 구성이 달라진다.</p><p id="29cf1fe9-dfba-4933-959e-1997e4888d91" class="">
+</p><pre id="63f58a47-0322-4425-a800-acf995bddf4d" class="code"><code>dots = sns.load_dataset(&quot;dots&quot;).query(&quot;align == &#x27;dots&#x27;&quot;)
+sns.relplot(x=&quot;time&quot;, y=&quot;firing_rate&quot;,
+            hue=&quot;coherence&quot;, style=&quot;choice&quot;,
+            kind=&quot;line&quot;, data=dots);</code></pre><p id="6e4a96a5-a3fe-4d41-ae28-d8957a13b913" class="">
+</p><figure id="5f292e98-52ad-42cb-86a0-e28b9179d054" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_43_0.png"><img style="width:437px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_43_0.png"/></a></figure><p id="12296d4d-f9ec-4c73-94f4-a8ef9df9c97b" class="">
+</p><p id="35d207bc-e02b-407e-85ff-469e05c31811" class="">
+</p><p id="855e77bf-5f1c-4392-ac69-158d7362c965" class=""><mark class="highlight-gray">It may happen that, even though the hue variable is numeric, it is poorly represented by a linear color scale. That’s the case here, where the levels of the hue variable are logarithmically scaled. You can provide specific color values for each line by passing a list or dictionary:</mark></p><p id="438e84a6-dea8-4f6b-88bf-2bdcb9d55f7a" class="">
+</p><p id="ea51b485-f3f3-4178-92ee-321e018feac7" class="">hue에 따른 구분 대상이 비록 (명목 범주가 아닌) 수치화 데이터일지라도, 그 데이터의 스케일에 따라 hue 구분의 효과가 형편 없을 때가 있다. 아래는 그에 해당하는 사례인데, 구분하고자 하는 변수 데이터의 스케일이 로그 함수를 따르는 스케일이었다. API에 리스트나 딕셔너리 타입으로 구체적인 색 구분을 부여함으로써 각각의 색을 표현해 줄 수도 있다.</p><p id="15416f66-bd5a-45e7-9058-9a74ddcccc79" class="">
+</p><p id="aff15f53-dfd1-4228-b9bc-c9f6185f8c52" class="">
+</p><pre id="ee01b282-c56c-4726-9555-259d97bfe59f" class="code"><code>palette = sns.cubehelix_palette(light=.8, n_colors=6)
+sns.relplot(x=&quot;time&quot;, y=&quot;firing_rate&quot;,
+            hue=&quot;coherence&quot;, style=&quot;choice&quot;,
+            palette=palette,
+            kind=&quot;line&quot;, data=dots);</code></pre><figure id="00a48fa9-1d6d-4a2d-95ea-4b0459d87faa" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_45_0.png"><img style="width:437px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_45_0.png"/></a></figure><p id="1809609b-2313-4bd0-8a09-0cd11e03191b" class=""><mark class="highlight-gray">Or you can alter how the colormap is normalized:</mark></p><p id="696ad570-c9ad-4003-afc3-a7a7dc60a87c" class="">이렇게 하거나 색 구분을 정규화하는 방식으로 바꿔볼 수 있다. (아래와 같이 <code>LogNorm</code> API를 사용) </p><p id="81f15d0c-297b-4a96-a581-11dfac2968be" class="">
+</p><p id="72423192-d682-4ba6-86f3-932b2e6fcaa6" class="">
+</p><pre id="f5de0a34-a72b-4c54-a5fb-eb52824654ee" class="code"><code>from matplotlib.colors import LogNorm
+palette = sns.cubehelix_palette(light=.7, n_colors=6)
+sns.relplot(x=&quot;time&quot;, y=&quot;firing_rate&quot;,
+            hue=&quot;coherence&quot;, style=&quot;choice&quot;,
+            hue_norm=LogNorm(),
+            kind=&quot;line&quot;, data=dots);</code></pre><figure id="29f1f4bd-c051-40be-b4dc-5bb38d2946bd" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_47_0.png"><img style="width:437px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_47_0.png"/></a></figure><p id="607f4b39-15e0-4a33-9ea2-fda13fdd702c" class=""><mark class="highlight-gray">The third semantic, size, changes the width of the lines:</mark></p><p id="efd3062b-2f16-4de5-96b0-a0c962d787f4" class="">(선의 색깔, 스타일에 이은) 세 번째의 의미 구분 변수인 size는 선의 두께를 바꾼다 :</p><p id="93dc4113-fc9c-4b82-9597-b4ae258eb437" class="">
+</p><pre id="a099f625-035f-41fb-8525-524bced2e092" class="code"><code>sns.relplot(x=&quot;time&quot;, y=&quot;firing_rate&quot;,
+            size=&quot;coherence&quot;, style=&quot;choice&quot;,
+            kind=&quot;line&quot;, data=dots);</code></pre><figure id="fb8b4792-3411-4196-bc7c-f4b188e9486b" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_49_0.png"><img style="width:437px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_49_0.png"/></a></figure><p id="3da6ac06-1da6-440f-a104-94c3caa0ee1c" class="block-color-gray">
+</p><p id="7bfa7b64-8eb3-41b6-8328-344e5e3d807c" class="block-color-gray">While the size variable will typically be numeric, it’s also possible to map a categorical variable with the width of the lines. Be cautious when doing so, because it will be difficult to distinguish much more than “thick” vs “thin” lines. However, dashes can be hard to perceive when lines have high-frequency variability, so using different widths may be more effective in that case:</p><p id="228ee53a-4b8d-4d91-91d9-9830bc27a7a1" class="">
+</p><p id="c8307e73-2df1-4c2e-a9aa-613fa4a347dc" class="">선의 두께(size)에 의한 구분은 대개 수치화된 변수일 때 쓰이지만, 명목 변수일 때도 선의 두께를 변화시켜 구분해 표현할 수 있다. 그때는 다음과 같은 사항을 주의해야한다. 선이 더 얇은지 두꺼운지를 구분하는 것 자체가 쉽지 않기 때문이다. 하지만 지금과 같이 그래프 선들이 큰 변동성을 갖는 상황에서는 파선과 같이 dash를 넣는 기법(즉 style을 통한 의미 구분)은 파악하기 더 어려워진다. 그땐 두께를 달리하는 게 더 효과적이라 볼 수 있다.</p><p id="8104a85a-f510-4593-b3ad-35d11bc3b40b" class="">
+</p><p id="49ae70d0-c69d-497d-b28c-1e6efed86458" class="">*variability 변동성이라 해석. 그래프가 variability가 높으면 왔다리 갔다리 하는 거임</p><p id="ffb641b4-2465-4070-b031-1ffe9cbaeb03" class="">
+</p><pre id="7ada7538-3e69-4f91-bbc6-0168568d75a7" class="code"><code>sns.relplot(x=&quot;time&quot;, y=&quot;firing_rate&quot;,
+           hue=&quot;coherence&quot;, size=&quot;choice&quot;,
+           palette=palette,
+           kind=&quot;line&quot;, data=dots);</code></pre><figure id="ff0a24aa-97da-4ccc-8b15-66a9cdc1c8f3" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_51_0.png"><img style="width:437px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_51_0.png"/></a></figure><p id="daa30a44-d782-41dc-b5e9-fc09ce3c59f2" class="">
+</p><h3 id="b582207d-3459-47fa-b231-fb993c4079da" class="">Plotting with date data¶</h3><p id="64a8b575-37d3-4742-b3e1-c32d49cd07f6" class="">날짜 시간 데이터 도표로 그리기</p><p id="9517e035-59a2-415a-9306-6aca994f33aa" class="">
+</p><p id="3c3bcfee-dfce-4377-8b15-8c91434f6318" class="block-color-gray">Line plots are often used to visualize data associated with real dates and times. These functions pass the data down in their original format to the underlying matplotlib functions, and so they can take advantage of matplotlib’s ability to format dates in tick labels. But all of that formatting will have to take place at the matplotlib layer, and you should refer to the matplotlib documentation to see how it works:</p><p id="ba3dcb97-d91f-4071-bb03-90681d2c1632" class="block-color-gray">
+</p><p id="7e942faa-5db6-40ba-93f7-c2cc2229ff04" class="">선 그래프들은 대개 실제 날짜와 시간의 흐름과 함께 시각화가 진행된다. 이때 Seaborn은 기반이 되는 matplotlib 패키지의 클래스에 데이터를 넘겨 줌으로써 구현한다. 그래서 손쉽게 matplotlib가 시간 데이터를 tick lables(만약 x 축에 시간을 둔다면 x축에 배열하는 시간 데이터들을 tick labels라 명명함) 로 전환하는 게 가능하다. 그러나 그렇게 구현된 모든 도표의 형식이 결국 matplotlib를 따라가기 때문에, 작업시 matplotlib의 공식문서를 참고하길 권장한다.</p><p id="f225139a-6ce6-4151-8e98-fbc869d31d01" class="">
+</p><p id="d0e27cc3-e3c3-4fb6-8c16-02ef96072eb7" class="">*pass down은 물려주다, 전하다 라는 의미이다.</p><p id="3132de3a-8fea-45ed-8e84-1d9b9d61ab2d" class="">
+</p><pre id="55d62ce3-1565-4668-bb52-17b7c820d306" class="code"><code>df = pd.DataFrame(dict(time=pd.date_range(&quot;2017-1-1&quot;, periods=500),
+                       value=np.random.randn(500).cumsum()))
+g = sns.relplot(x=&quot;time&quot;, y=&quot;value&quot;, kind=&quot;line&quot;, data=df)
+g.fig.autofmt_xdate()</code></pre><pre id="f78076b2-1a95-4e0d-8846-f16ada9f4430" class="code"><code>/Users/mwaskom/miniconda3/envs/seaborn-py37-latest/lib/python3.7/site-packages/pandas/plotting/_matplotlib/converter.py:103: FutureWarning: Using an implicitly registered datetime converter for a matplotlib plotting method. The converter was registered by pandas on import. Future versions of pandas will require you to explicitly register matplotlib converters.
+
+To register the converters:
+    &gt;&gt;&gt; from pandas.plotting import register_matplotlib_converters
+    &gt;&gt;&gt; register_matplotlib_converters()
+  warnings.warn(msg, FutureWarning)</code></pre><figure id="883d0fe7-4c99-4711-9969-bbcc1f96c2c7" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_53_1.png"><img style="width:352px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_53_1.png"/></a></figure><p id="39ca2212-2947-4631-8e12-dae7849d99f7" class="">
+</p><h3 id="01df1670-eceb-48b4-9f51-f15bb7f9ca9c" class="">Showing multiple relationships with facets</h3><p id="42d3d694-abc6-4ce2-a6f0-b10bac4213e5" class="">파셋 개념을 이용해 여러 관계들을 표현하기</p><p id="6107f4bf-9965-453c-aa18-8cae90188b01" class="">
+</p><p id="5944c518-d7dc-416c-84e1-da28fcee7f07" class=""><mark class="highlight-gray">We’ve emphasized in this tutorial that, while these functions can show several semantic variables at once, it’s not always effective to do so. But what about when you do want to understand how a relationship between two variables depends on more than one other variable?</mark></p><p id="0bb64a14-1dd5-4d10-b057-156133dc6434" class="">
+</p><p id="b77a0e04-82fd-4de2-a8ab-7445d70fb78a" class="">이 튜토리얼을 통해, 지금까지 배운 기능들이 hue와 같은 의미 변수(semantics) 추가로 한번에 여러 정보를 전달할 수 있다는 걸 확인했다. 물론 그게 언제나 유용하다는 것은 아니었지만... 자, 만약 관찰하고자 하는 2개의 변수가 제 3의 변수에 의해서 (그것이 하나든 여럿이든) 영향을 받아 어떤 관계를 보이는지 궁금하다면 어떻게 해야하나?</p><p id="c4ac4e38-36e4-4411-811e-49b2edb3ecbd" class="">
+</p><p id="7731a9ba-1621-494e-814f-70d0aa9b7680" class=""><mark class="highlight-gray">The best approach may be to make more than one plot. Because relplot() is based on the FacetGrid, this is easy to do. To show the influence of an additional variable, instead of assigning it to one of the semantic roles in the plot, use it to “facet” the visualization. This means that you make multiple axes and plot subsets of the data on each of them:</mark></p><p id="4afd8a3b-32b9-4cdb-b297-5f5d807d7627" class="">
+</p><p id="ac631cf2-217e-4218-ac21-d43e8526a38e" class="">가장 좋은 방법은 아마 한 개의 도표를 더 그리는 것이다. 왜냐하면 <code>relplot() </code>은 <code>FacetGrid</code> 기능을 기반으로 하기 때문에 도표 하나 더 그리는 것 정도야 쉽기 때문이다. 추가적인 변수에 의한 영향을 표현하기 위해서는 의미 구분을 하나의 도표에서 쓰기보다는, 파셋facet을 통해 시각화해보자. 그 말인 즉슨, 여러 개의 도표를 그려서 각각의 도표에 데이터를 나눠서 표현하는 것이다.</p><p id="2647cee6-98ed-4131-bd6d-2c7b5904a19c" class="">
+</p><pre id="e5e16b75-8af2-49cd-9a8d-b7987e0c2512" class="code"><code># col = &#x27;time&#x27; 이라고 파라미터를 줘서 칼럼 방향(가로로)으로 여러 도표를 그리게 했다
+
+sns.relplot(x=&quot;total_bill&quot;, y=&quot;tip&quot;, hue=&quot;smoker&quot;,
+            col=&quot;time&quot;, data=tips);</code></pre><p id="7e2b3c9b-9b41-4caf-bf9d-f18184092e3a" class="">
+</p><figure id="cca30efe-b61d-4b86-b2f9-525c037afb57" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_55_0.png"><img style="width:788px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_55_0.png"/></a></figure><p id="0e2119b6-6091-4481-918d-f294d4b02d73" class="">
+</p><p id="6da02f6c-cff6-4bda-884d-5929561d8ab2" class="">
+</p><p id="bb8e9e70-9e89-442b-9c58-9662dc949604" class="block-color-gray">You can also show the influence two variables this way: one by faceting on the columns and one by faceting on the rows. As you start adding more variables to the grid, you may want to decrease the figure size. Remember that the size FacetGrid is parameterized by the height and aspect ratio of each facet:</p><p id="258cca4e-867d-44e6-abc4-c2931b671e42" class="">
+</p><p id="2a49c178-7725-4ab8-ad17-dd73bb1ca24a" class="">2개의 변수가 영향을 받는 건 이런 방식으로도 표현이 가능하다 : 하나는 칼럼 방향으로 도표를 여럿 그리고, 또 하나는 로우 방향으로 도표들을 그리는 것이다. 점점 더 많은 변수들을 그 속에 추가하다 보면, 공간이 부족해 각각의 그래프들의 크기는 줄어드는 걸 원할 수 있다. 이때 <code>FacetGrid</code> 는 <code>height</code> 파라미터를 갖고 있음을 기억하면 된다. (그래프들의 좌우 비율은 height에 맞게 자동 조정됨 - aspect ratio)</p><p id="da3b1f8d-ee2c-4b57-bcaf-3b7c6c0f0d32" class="">
+</p><pre id="7f19452d-a915-4e89-b06b-b06623ea8e19" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;subject&quot;,
+            col=&quot;region&quot;, row=&quot;event&quot;, height=3,
+            kind=&quot;line&quot;, estimator=None, data=fmri);</code></pre><figure id="4f62c3a3-be63-461e-ab56-cd97b9acf289" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_57_0.png"><img style="width:495px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_57_0.png"/></a></figure><p id="47205d11-f3a1-4681-a091-a2ac60d174e2" class="">
+</p><p id="51640314-c803-485a-8844-7f356d74afbc" class="">
+</p><p id="cb8c6ad2-5bda-478f-9cec-542d87253765" class=""><mark class="highlight-gray">When you want to examine effects across many levels of a variable, it can be a good idea to facet that variable on the columns and then “wrap” the facets into the rows:</mark></p><p id="8eb3d33d-85d6-47a4-b6ef-d08a941e1325" class="">
+</p><p id="d24bf684-8af9-4e20-8e8d-e8260284256f" class="">여러 단계를 가진 변수에 걸쳐 나타나는 영향을 시각적으로 파악하고 싶다면, 그 변수를 <code>col</code> 인자의 매개변수로(<code>col = &quot;subject&quot;</code>)놓아보자. &quot;래핑wrap&quot; 기능을 통해 그 단계에 해당하는 그래프를 정해 둔 갯수만큼 로우row 방향으로 정렬시켜 표현할 수 있다.</p><p id="aa1ed2dd-355a-4393-8219-3550fcd8a065" class="">(주석 : <code>col_wrap = 5 </code>로 지정하면 5의 배수들 만큼 각 row마다 그래프를 배치한다는 뜻)</p><pre id="2bdc4474-ee2d-426f-abb4-2da7f99798c7" class="code"><code>sns.relplot(x=&quot;timepoint&quot;, y=&quot;signal&quot;, hue=&quot;event&quot;, style=&quot;event&quot;,
+            col=&quot;subject&quot;, col_wrap=5,
+            height=3, aspect=.75, linewidth=2.5,
+            kind=&quot;line&quot;, data=fmri.query(&quot;region == &#x27;frontal&#x27;&quot;));</code></pre><figure id="9dcee84f-e41c-4d30-8ec3-1f848ad8481d" class="image"><a href="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_59_0.png"><img style="width:870px" src="Visualizing%20statistical%20relationships%20e6446257dd7d418abc8a1bdc846a5543/relational_59_0.png"/></a></figure><p id="c2c21a29-5704-44f2-98b4-aa5b2af65600" class="">
+</p><p id="6766a393-691c-4076-8748-5467c3758baf" class="block-color-gray">These visualizations, which are often called “lattice” plots or “small-multiples”, are very effective because they present the data in a format that makes it easy for the eye to detect both overall patterns and deviations from those patterns. While you should make use of the flexibility afforded by scatterplot() and relplot(), always try to keep in mind that several simple plots are usually more effective than one complex plot.</p><p id="e8178cbd-3e49-49df-9889-f61852638416" class="">
+</p><p id="e6bc5f7f-a7b7-40a6-9014-a40ed87c17be" class="">&quot;격자lattice 도표&quot; 혹은 &quot;소형-다중 도표 small - multiples&quot;라 불리는 이러한 시각화 기법은 시각적으로 전체적인 패턴들과 각 패턴들이 나타나는 차이들을 모두 쉽게 감지할 수 있기 때문에 매우 효과적이다. <code>scatterplot()</code>과 <code>relplot()</code> 들의 (hue와 같은 의미 구분 기법 등을 통한) 유연한 기능성을 잘 활용하는 것도 중요하나, 복잡한 도표를 그리는 것보다는 단순한 도표를 여러개 그리는 게 더 효과적이라는 걸 늘 명심하길 바란다.</p><p id="d9bba77a-22e1-4a21-bacb-d0669a8486da" class="">
+</p><p id="529c8824-4f11-4493-9329-ec6ea07f2a20" class="">*lattice 는 격자를 의미</p></div></article></body></html>
